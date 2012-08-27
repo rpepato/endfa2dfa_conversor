@@ -73,7 +73,6 @@ class Conversor
   
   def remove_empty_states(array)
     array.delete('ø')
-    array.delete('empty')
   end
   
 end
