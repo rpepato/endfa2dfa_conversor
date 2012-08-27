@@ -5,7 +5,7 @@ require File.expand_path(File.join('.', 'spec_helper'), File.dirname(__FILE__))
 require 'conversor'    
 
 
-describe "E-NFDA To DFA conversor" do
+describe "E-NDFA To DFA conversor" do
   
   before(:each) do
     alphabect = ['', '+', '-', '.', '0', '1', '2', '3','4','5','6','7','8','9']
