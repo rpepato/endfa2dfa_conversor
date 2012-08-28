@@ -25,16 +25,6 @@ class Conversor
      new_initial_state = eclose(@initial_state)                                                          
      insert_new_state(dfa, array_to_hash_symbol(new_initial_state))    
      dfa
-  end 
-  
-  def print_dfa
-    dfa = to_dfa
-    dfa.to_a.sort.each do |item|
-      puts item[0]
-      item[1].each_pair do |symbol, destination|
-        puts "\t#{symbol} => #{destination}"
-      end                                       
-    end            
   end  
   
   def insert_new_state(hash, state)
@@ -75,4 +65,4 @@ class Conversor
     array.delete('ø')
   end
   
-end
+end   
