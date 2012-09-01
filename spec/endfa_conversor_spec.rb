@@ -251,7 +251,14 @@ describe "E-NDFA To DFA conversor" do
                           }                                                                                                                                                         
               }    
       @endfa.to_dfa.should == dfa
-    end
+    end   
+    
+    it "should set new initial state" do
+      @endfa.to_dfa
+      @endfa.initial_state_after_processing.should == :q0_q1
+    end   
+    
+    
     
   end
   
