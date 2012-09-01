@@ -123,7 +123,7 @@ describe "E-NDFA To DFA conversor" do
                                      '9'       =>  ['ø']
                                   }                                                                      
                   		}   
-    @endfa = Conversor.new(endfa_hash, alphabect, [:q5], :q0)                 		 
+    @endfa = Conversor.new(endfa_hash, alphabect, ["q5"], "q0")                 		 
                   		                                                                                                   
   end
   
@@ -258,6 +258,10 @@ describe "E-NDFA To DFA conversor" do
       @endfa.initial_state_after_processing.should == :q0_q1
     end   
     
+    it "test" do
+      @endfa.to_dfa
+      @endfa.final_states_after_processing.should == [:q2_q3_q5, :q3_q5]
+    end
     
     
   end

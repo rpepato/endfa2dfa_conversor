@@ -5,7 +5,7 @@ class Conversor
   def initialize(automaton = {}, alphabect = [], final_states = [], initial_state)
     @automaton = automaton                     
     @alphabect = alphabect 
-    @initial_state = initial_state
+    @initial_state = initial_state.to_sym
     @final_states = final_states
     @new_final_states = []
   end                     
@@ -34,7 +34,7 @@ class Conversor
   end   
   
   def final_states_after_processing
-    @new_final_states
+    @new_final_states.sort
   end
   
   def insert_new_state(hash, state)
@@ -56,7 +56,8 @@ class Conversor
       end
       new_symbol = array_to_hash_symbol(transitions[symbol])  
 
-      if (transitions[symbol] - @final_states != transitions[symbol])
+      if (transitions[symbol] - @final_states != transitions[symbol] && 
+         !@new_final_states.include?(array_to_hash_symbol(transitions[symbol])))
          @new_final_states << array_to_hash_symbol(transitions[symbol]) 
       end                                                           
     end
