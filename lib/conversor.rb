@@ -1,4 +1,5 @@
 # encoding: utf-8 
+# teste de github
 class Conversor
   
   def initialize(automaton = {}, alphabect = [], final_states = [], initial_state)
