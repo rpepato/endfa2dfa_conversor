@@ -253,6 +253,59 @@ describe "E-NDFA To DFA conversor" do
       @endfa.to_dfa.should == dfa
     end
     
+    it "should convert an e-nfa to a nfa" do
+    enfa_hash       = { 	
+                          :ø =>  {
+                                    ''        =>  ['ø'],
+                                    'a'       =>  ['ø'],
+                                    'b'       =>  ['ø']
+                                  },
+                          :q0 =>  {
+                                    ''        =>  ["q1"],
+                                    'a'       =>  ['ø'],
+                                    'b'       =>  ['ø']
+                                  },
+                          :q1 =>  {
+                                    ''        =>  ['ø'],
+                                    'a'       =>  ["q1","q2"],
+                                    'b'       =>  ['ø']
+                                  }, 
+                          :q2 =>  {
+                                    ''        =>  ['ø'],
+                                    'a'       =>  ['ø'],
+                                    'b'       =>  ["q3"]
+                                  },
+                          :q3 =>  {
+                                    ''        =>  ["q1"],
+                                    'a'       =>  ['ø'],
+                                    'b'       =>  ['ø']
+                                  }                                                                 
+                       }
+
+    nfa_hash       = { 	
+                          :ø =>  {
+                                    'a'       =>  ['ø'],
+                                    'b'       =>  ['ø']
+                                  },
+                          :q0 =>  {
+                                    'a'       =>  ["q1","q2"],
+                                    'b'       =>  ['ø']
+                                  },
+                          :q1 =>  {
+                                    'a'       =>  ["q1","q2"],
+                                    'b'       =>  ['ø']
+                                  }, 
+                          :q2 =>  {
+                                    'a'       =>  ['ø'],
+                                    'b'       =>  ["q3","q1"]
+                                  },
+                          :q3 =>  {
+                                    'a'       =>  ["q1","q2"],
+                                    'b'       =>  ['ø']
+                                  } ,                                                                 
+                       }  
+	Conversor.new(enfa_hash, ['','a','b'], [:q1], :q0).to_nfa.automaton.should  ==  nfa_hash 
+    end
   end
   
 end
