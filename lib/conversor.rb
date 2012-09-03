@@ -7,7 +7,9 @@ class Conversor
     @automaton = automaton                     
     @alphabet = alphabet 
     @initial_state = initial_state
+    @initial_state = initial_state.to_sym
     @final_states = final_states
+    @new_final_states = []
   end                     
   
   def eclose(state, states=@automaton)  
@@ -24,10 +26,18 @@ class Conversor
   
   def to_dfa
      dfa = {}                   
-     new_initial_state = eclose(@initial_state)                                                          
-     insert_new_state(dfa, array_to_hash_symbol(new_initial_state))    
+     @new_initial_state = eclose(@initial_state)                                                          
+     insert_new_state(dfa, array_to_hash_symbol(@new_initial_state))    
      dfa
   end  
+  
+  def initial_state_after_processing
+     array_to_hash_symbol(@new_initial_state)
+  end   
+  
+  def final_states_after_processing
+    @new_final_states.sort
+  end
   
   def insert_new_state(hash, state)
 
@@ -46,7 +56,12 @@ class Conversor
       if transitions[symbol].count != 1
         remove_empty_states(transitions[symbol])
       end
-      new_symbol = array_to_hash_symbol(transitions[symbol])    
+      new_symbol = array_to_hash_symbol(transitions[symbol])  
+
+      if (transitions[symbol] - @final_states != transitions[symbol] && 
+         !@new_final_states.include?(array_to_hash_symbol(transitions[symbol])))
+         @new_final_states << array_to_hash_symbol(transitions[symbol]) 
+      end                                                           
     end
 
     hash[state] = transitions
