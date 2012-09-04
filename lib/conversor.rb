@@ -39,20 +39,10 @@ class Conversor
   def final_states_after_processing
     @new_final_states.sort
   end
-  
+
   def insert_new_state(hash, state)
 
-    transitions = {}
-
-    @alphabet.select {|item| item != ''}.each do |symbol|
-      next_states = state.flat_map{ |char| @automaton[char][symbol]}    
-
-      transitions[symbol] = next_states.flat_map{ |next_state| eclose(next_state)}.sort.uniq 
- 
-     if transitions[symbol].count != 1
-        remove_empty_states(transitions[symbol])
-      end                                                         
-    end
+    transitions = dfa_transitions(@automaton, @alphabet.select {|item| item != ''} , state)
 
     hash[array_to_hash_symbol(state)] = transitions
 
@@ -62,6 +52,16 @@ class Conversor
       end
     end
 
+  end
+
+  def dfa_transitions(automaton, alphabet , state)
+	transitions = alphabet.map{|symbol| dfa_transition(automaton, symbol, state)}
+	Hash[transitions]
+  end
+
+  def dfa_transition(automaton, symbol, state)
+	next_states = state.flat_map{ |state| automaton[state][symbol]}.flat_map{ |next_state| eclose(next_state)}.sort.uniq 
+	[symbol, remove_empty_states_when_there_are_many_states(next_states)]
   end
 
   def dfa_final_state(hash)
@@ -77,10 +77,6 @@ class Conversor
   
   def array_to_hash_symbol(array)
       array.sort.map{|sym| sym.to_s}.join("_").to_sym
-  end
-  
-  def remove_empty_states(array)
-    array.delete(:ø)
   end
 
   def to_nfa
