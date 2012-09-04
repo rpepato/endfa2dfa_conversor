@@ -6,28 +6,28 @@ class Conversor
   def initialize(automaton = {}, alphabet = [], final_states = [], initial_state)
     @automaton = automaton                     
     @alphabet = alphabet 
-    @initial_state = initial_state
     @initial_state = initial_state.to_sym
+    @new_initial_state = []
     @final_states = final_states
     @new_final_states = []
   end                     
   
   def eclose(state, states=@automaton)  
-    if (state == 'ø' || state == :ø)
-       return ['ø']
+    if (state == :ø)
+       return [:ø]
     end
     resultant_states = [] 
-    resultant_states << state.to_s
-    resultant_states << states[state.to_sym]['']   
+    resultant_states << state
+    resultant_states << states[state]['']   
     resultant_states = resultant_states.flatten
-    resultant_states.delete("ø")          
+    resultant_states.delete(:ø)          
     resultant_states.uniq
   end
   
   def to_dfa
      dfa = {}                   
      @new_initial_state = eclose(@initial_state)                                                          
-     insert_new_state(dfa, array_to_hash_symbol(@new_initial_state))    
+     insert_new_state(dfa, @new_initial_state)    
      dfa
   end  
   
@@ -44,42 +44,51 @@ class Conversor
     transitions = {}
 
     @alphabet.select {|item| item != ''}.each do |symbol|
-      next_states = []
-      state.to_s.split('_').each do |char|       
-        next_states << @automaton[char.to_sym][symbol]
-      end    
-      eclose_next_states = []
-      next_states.flatten.each do |next_state|
-         eclose_next_states << eclose(next_state)
-      end    
-      transitions[symbol] = eclose_next_states.flatten.sort.uniq
-      if transitions[symbol].count != 1
-        remove_empty_states(transitions[symbol])
-      end
-      new_symbol = array_to_hash_symbol(transitions[symbol])  
+      next_states = state.flat_map{ |char| @automaton[char][symbol]}    
 
+      transitions[symbol] = next_states.flat_map{ |next_state| eclose(next_state)}.sort.uniq 
+ 
+     if transitions[symbol].count != 1
+        remove_empty_states(transitions[symbol])
+      end                                                         
+    end
+
+    @alphabet.select {|item| item != ''}.each do |symbol|
       if (transitions[symbol] - @final_states != transitions[symbol] && 
          !@new_final_states.include?(array_to_hash_symbol(transitions[symbol])))
          @new_final_states << array_to_hash_symbol(transitions[symbol]) 
       end                                                           
     end
 
-    hash[state] = transitions
+    hash[array_to_hash_symbol(state)] = transitions
 
     transitions.each_pair do |key, value|
       if(!hash.has_key?(array_to_hash_symbol(value)))
-        insert_new_state(hash, array_to_hash_symbol(value))
+        insert_new_state(hash, value)
       end
     end
 
   end
+
+  def dfa_final_state(hash, state)
+
+    transitions = {}
+
+
+    @alphabet.select {|item| item != ''}.each do |symbol|
+      if (transitions[symbol] - @final_states != transitions[symbol] && 
+         !@new_final_states.include?(array_to_hash_symbol(transitions[symbol])))
+         @new_final_states << array_to_hash_symbol(transitions[symbol]) 
+      end                                                           
+    end
+  end
   
   def array_to_hash_symbol(array)
-      array.join("_").to_sym
+      array.sort.map{|sym| sym.to_s}.join("_").to_sym
   end
   
   def remove_empty_states(array)
-    array.delete('ø')
+    array.delete(:ø)
   end
 
   def to_nfa
@@ -102,12 +111,12 @@ class Conversor
   end
 
   def nfa_transition(automaton, symbol, state)
-	reached_states = eclose(state, automaton).map{|state| state.to_sym }.flat_map{|state| automaton[state][symbol]}.map{|state| state.to_sym }.flat_map{|state| eclose(state, automaton)}.uniq
+	reached_states = eclose(state, automaton).flat_map{|state| automaton[state][symbol]}.flat_map{|state| eclose(state, automaton)}.uniq
 	[symbol, remove_empty_states_when_there_are_many_states(reached_states)]
   end
 
   def remove_empty_states_when_there_are_many_states(states)
-    	(states.size>1)? states.select{|state| state!='ø'} : states
+    	(states.size>1)? states.select{|state| state!=:ø} : states
   end
 
 end   
