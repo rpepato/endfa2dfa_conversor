@@ -27,7 +27,8 @@ class Conversor
   def to_dfa
      dfa = {}                   
      @new_initial_state = eclose(@initial_state)                                                          
-     insert_new_state(dfa, @new_initial_state)    
+     insert_new_state(dfa, @new_initial_state) 
+     dfa_final_state(dfa)   
      dfa
   end  
   
@@ -53,13 +54,6 @@ class Conversor
       end                                                         
     end
 
-    @alphabet.select {|item| item != ''}.each do |symbol|
-      if (transitions[symbol] - @final_states != transitions[symbol] && 
-         !@new_final_states.include?(array_to_hash_symbol(transitions[symbol])))
-         @new_final_states << array_to_hash_symbol(transitions[symbol]) 
-      end                                                           
-    end
-
     hash[array_to_hash_symbol(state)] = transitions
 
     transitions.each_pair do |key, value|
@@ -70,17 +64,15 @@ class Conversor
 
   end
 
-  def dfa_final_state(hash, state)
-
-    transitions = {}
-
-
-    @alphabet.select {|item| item != ''}.each do |symbol|
-      if (transitions[symbol] - @final_states != transitions[symbol] && 
-         !@new_final_states.include?(array_to_hash_symbol(transitions[symbol])))
-         @new_final_states << array_to_hash_symbol(transitions[symbol]) 
-      end                                                           
-    end
+  def dfa_final_state(hash)
+    	hash.each_pair do |state, transitions|
+	    @alphabet.select {|item| item != ''}.each do |symbol|
+	      if (! ( transitions[symbol] & @final_states ).empty? && 
+		 !@new_final_states.include?(array_to_hash_symbol(transitions[symbol])))
+		 @new_final_states << array_to_hash_symbol(transitions[symbol]) 
+	      end                                                           
+	    end
+	end
   end
   
   def array_to_hash_symbol(array)
@@ -97,7 +89,7 @@ class Conversor
   end
 
   def nfa_final_states(automaton, final_states)
-	automaton.keys.select{|state| ( eclose(state,automaton) & final_states ).size>0 }.concat(final_states).uniq		
+	automaton.keys.select{|state| ! ( eclose(state,automaton) & final_states ).empty? }.concat(final_states).uniq		
   end	
   
   def nfa_automaton(old_automaton, alphabet)
