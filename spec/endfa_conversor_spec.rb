@@ -10,7 +10,7 @@ describe "E-NDFA To DFA conversor" do
   before(:each) do
     alphabect = ['', '+', '-', '.', '0', '1', '2', '3','4','5','6','7','8','9']
     endfa_hash       = { 	
-                          :ø =>  {
+                          [:ø] =>  {
                                     ''        =>  [:ø],
                                     '+'       =>  [:ø],
                                     '-'       =>  [:ø],
@@ -26,7 +26,7 @@ describe "E-NDFA To DFA conversor" do
                                     '8'       =>  [:ø],  
                                     '9'       =>  [:ø] 
                                   },
-                          :q0 =>  {
+                          [:q0] =>  {
                                     ''        =>  [:q1],
                                     '+'       =>  [:q1],
                                     '-'       =>  [:q1],
@@ -42,7 +42,7 @@ describe "E-NDFA To DFA conversor" do
                                     '8'       =>  [:ø],  
                                     '9'       =>  [:ø] 
                                   },
-                          :q1 =>  {
+                          [:q1] =>  {
                                     ''        =>  [:ø],
                                     '+'       =>  [:ø],
                                     '-'       =>  [:ø],
@@ -58,7 +58,7 @@ describe "E-NDFA To DFA conversor" do
                                     '8'       =>  [:q1, :q4],  
                                     '9'       =>  [:q1, :q4] 
                                   }, 
-                          :q2 =>  {
+                          [:q2] =>  {
                                      ''        =>  [:ø],
                                      '+'       =>  [:ø],
                                      '-'       =>  [:ø],
@@ -74,7 +74,7 @@ describe "E-NDFA To DFA conversor" do
                                      '8'       =>  [:q3],  
                                      '9'       =>  [:q3]
                                   },
-                          :q3 =>  {
+                          [:q3] =>  {
                                      ''        =>  [:q5],
                                      '+'       =>  [:ø],
                                      '-'       =>  [:ø],
@@ -90,7 +90,7 @@ describe "E-NDFA To DFA conversor" do
                                      '8'       =>  [:q3],  
                                      '9'       =>  [:q3]
                                   },                                                                                                    
-                          :q4 =>  {
+                          [:q4] =>  {
                                      ''        =>  [:ø],
                                      '+'       =>  [:ø],
                                      '-'       =>  [:ø],
@@ -106,7 +106,7 @@ describe "E-NDFA To DFA conversor" do
                                      '8'       =>  [:ø],  
                                      '9'       =>  [:ø]
                                   },
-                          :q5 =>  {
+                          [:q5] =>  {
                                      ''        =>  [:ø],
                                      '+'       =>  [:ø],
                                      '-'       =>  [:ø],
@@ -123,28 +123,69 @@ describe "E-NDFA To DFA conversor" do
                                      '9'       =>  [:ø]
                                   }                                                                      
                   		}   
-    @endfa = Conversor.new(endfa_hash, alphabect, [:q5], :q0)                 		 
-                  		                                                                                                   
+    @endfa = Conversor.new(endfa_hash, alphabect, [[:q5]], [:q0])                 		 
+    enfa       = { 	
+		          [:ø] =>  {
+		                    ''        =>  [:ø],
+		                    'a'       =>  [:ø],
+		                    'b'       =>  [:ø]
+		                  },
+		          [:q0] =>  {
+		                    ''        =>  [:q1],
+		                    'a'       =>  [:ø],
+		                    'b'       =>  [:ø]
+		                  },
+		          [:q1] =>  {
+		                    ''        =>  [:ø],
+		                    'a'       =>  [:q1,:q2],
+		                    'b'       =>  [:ø]
+		                  }, 
+		          [:q2] =>  {
+		                    ''        =>  [:q3],
+		                    'a'       =>  [:ø],
+		                    'b'       =>  [:q4]
+		                  },
+		          [:q3] =>  {
+		                    ''        =>  [:ø],
+		                    'a'       =>  [:q4],
+		                    'b'       =>  [:ø]
+		                  },
+			  [:q4] =>  {
+		                    ''        =>  [:q1],
+		                    'a'       =>  [:ø],
+		                    'b'       =>  [:ø]
+		                  }                                                                 
+		       }                  	
+     @another_enfa = Conversor.new(enfa, ['','a','b'], [[:q1]], [:q0])                                                                                                    
   end
   
   describe "When converting" do
     
     it "should get simple e-close for state" do
-      @endfa.eclose(:q1).should == [:q1]
-      @endfa.eclose(:q1).should == [:q1]      
+      @endfa.eclose([:q1]).should == [:q1]
+      @endfa.eclose([:q1]).should == [:q1]      
     end                             
     
     it "should get composite e-close for state" do
-       @endfa.eclose(:q3).should == [:q3, :q5]
+       @endfa.eclose([:q3]).should == [:q3, :q5]
     end  
     
     it "should get e-close for epsilon state" do
-       @endfa.eclose(:ø).should == [:ø]
+       @endfa.eclose([:ø]).should == [:ø]
     end
+
+    it "should get extended_transition for state" do
+       @another_enfa.extended_transition([:q1],'a',@another_enfa.automaton).should == ['a',[:q1,:q2,:q3]]
+    end
+
+    it "should get all transitions for state" do
+       @another_enfa.transitions([:q1],['a','b'],@another_enfa.automaton).should == {"a"=>[:q1, :q2, :q3], "b"=>[:ø]} 
+    end
+
     
     it "should convert an e-ndfa to a dfa" do
       dfa =   {
-                :q0_q1 => {
+                [:q0,:q1] => {
                             '+'         => [:q1],
                             '-'         => [:q1],
                             '.'         => [:q2],
@@ -159,7 +200,7 @@ describe "E-NDFA To DFA conversor" do
                             '8'         => [:q1, :q4],
                             '9'         => [:q1, :q4]
                           },
-                :q1 =>    {
+                [:q1] =>    {
                             '+'         => [:ø],
                             '-'         => [:ø],
                             '.'         => [:q2],
@@ -174,7 +215,7 @@ describe "E-NDFA To DFA conversor" do
                             '8'         => [:q1, :q4],
                             '9'         => [:q1, :q4]
                           },   
-                :q1_q4 => {
+                [:q1,:q4] => {
                             '+'         => [:ø],
                             '-'         => [:ø],
                             '.'         => [:q2, :q3, :q5],
@@ -189,7 +230,7 @@ describe "E-NDFA To DFA conversor" do
                             '8'         => [:q1, :q4],
                             '9'         => [:q1, :q4]
                           },
-                :q2 =>    {
+                [:q2] =>    {
                             '+'         => [:ø],
                             '-'         => [:ø],
                             '.'         => [:ø],
@@ -204,7 +245,7 @@ describe "E-NDFA To DFA conversor" do
                             '8'         => [:q3, :q5],
                             '9'         => [:q3, :q5]
                           },
-                :q2_q3_q5 =>  {
+                [:q2,:q3,:q5] =>  {
                             '+'         => [:ø],
                             '-'         => [:ø],
                             '.'         => [:ø],
@@ -219,7 +260,7 @@ describe "E-NDFA To DFA conversor" do
                             '8'         => [:q3, :q5],
                             '9'         => [:q3, :q5]
                           },
-                :q3_q5 => {
+                [:q3,:q5] => {
                             '+'         => [:ø],
                             '-'         => [:ø],
                             '.'         => [:ø],
@@ -234,7 +275,7 @@ describe "E-NDFA To DFA conversor" do
                             '8'         => [:q3, :q5],
                             '9'         => [:q3, :q5]
                           },
-                :ø =>     {
+                [:ø] =>     {
                             '+'         => [:ø],
                             '-'         => [:ø],
                             '.'         => [:ø],
@@ -255,66 +296,43 @@ describe "E-NDFA To DFA conversor" do
     
     it "should set new initial state" do
       @endfa.to_dfa
-      @endfa.initial_state_after_processing.should == :q0_q1
+      @endfa.new_initial_state.should == [:q0,:q1]
     end   
     
     it "test" do
       @endfa.to_dfa
-      @endfa.final_states_after_processing.should == [:q2_q3_q5, :q3_q5]
+      @endfa.final_states_after_processing.should == [[:q2,:q3,:q5], [:q3,:q5]]
     end
     
     it "should convert an e-nfa to a nfa" do
-    enfa       = { 	
-                          :ø =>  {
-                                    ''        =>  [:ø],
-                                    'a'       =>  [:ø],
-                                    'b'       =>  [:ø]
-                                  },
-                          :q0 =>  {
-                                    ''        =>  [:q1],
-                                    'a'       =>  [:ø],
-                                    'b'       =>  [:ø]
-                                  },
-                          :q1 =>  {
-                                    ''        =>  [:ø],
-                                    'a'       =>  [:q1,:q2],
-                                    'b'       =>  [:ø]
-                                  }, 
-                          :q2 =>  {
-                                    ''        =>  [:ø],
-                                    'a'       =>  [:ø],
-                                    'b'       =>  [:q3]
-                                  },
-                          :q3 =>  {
-                                    ''        =>  [:q1],
-                                    'a'       =>  [:ø],
-                                    'b'       =>  [:ø]
-                                  }                                                                 
-                       }
 
     nfa       = { 	
-                          :ø =>  {
+                          [:ø] =>  {
                                     'a'       =>  [:ø],
                                     'b'       =>  [:ø]
                                   },
-                          :q0 =>  {
-                                    'a'       =>  [:q1,:q2],
+                          [:q0] =>  {
+                                    'a'       =>  [:q1,:q2,:q3],
                                     'b'       =>  [:ø]
                                   },
-                          :q1 =>  {
-                                    'a'       =>  [:q1,:q2],
+                          [:q1] =>  {
+                                    'a'       =>  [:q1,:q2,:q3],
                                     'b'       =>  [:ø]
                                   }, 
-                          :q2 =>  {
-                                    'a'       =>  [:ø],
-                                    'b'       =>  [:q1,:q3],
+                          [:q2] =>  {
+                                    'a'       =>  [:q1,:q4],
+                                    'b'       =>  [:q1,:q4],
                                   },
-                          :q3 =>  {
-                                    'a'       =>  [:q1,:q2],
+                          [:q3] =>  {
+                                    'a'       =>  [:q1,:q4],
                                     'b'       =>  [:ø]
-                                  } ,                                                                 
+                                  } ,
+			  [:q4] =>  {
+                                    'a'       =>  [:q1,:q2,:q3],
+                                    'b'       =>  [:ø]
+                                  }                                                                  
                        }  
-	Conversor.new(enfa, ['','a','b'], [:q1], :q0).to_nfa.automaton.should  ==  nfa 
+	@another_enfa.to_nfa.automaton.should  ==  nfa 
     end
 
   end
