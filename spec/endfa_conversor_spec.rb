@@ -233,8 +233,30 @@ should false}.to raise_error(ArgumentError, 'Alphabet must contain all character
       @endfa.transition_function[[:q0]]['+']=[:q0]
       @endfa.transition_function[[:q0]]['-']=[:q0]
       expect{Conversor.new(@endfa.states, @endfa.alphabet, @endfa.transition_function, @endfa.initial_state, @endfa.final_states)
-should false}.to raise_error(ArgumentError, 'Initial state must have transition for another state')
+should false}.to raise_error(ArgumentError, 'It must have transition from Initial state')
     end
+
+    it "should complete enfa" do
+    enfa       = { 	
+		          [:q0] =>  {
+		                    ''        =>  [:q1]
+		                  },
+		          [:q1] =>  {
+		                    'a'       =>  [:q1,:q2]
+		                  }, 
+		          [:q2] =>  {
+		                    ''        =>  [:q3],
+		                    'b'       =>  [:q4]
+		                  },
+		          [:q3] =>  {
+		                    'a'       =>  [:q4]
+		                  },
+		          [:q4] =>  {
+		                    ''        =>  [:q1]
+		                  }                                                                 
+		       }
+       Conversor.new(enfa.keys, ['','a','b'], enfa, [:q0], [[:q1]]).to_dfa.transition_function.should == @another_enfa.to_dfa.transition_function    
+    end    
 
     it "should get simple e-close for state" do
       @endfa.eclose([:q1]).should == [:q1]

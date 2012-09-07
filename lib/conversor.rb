@@ -17,13 +17,25 @@ class Conversor
   
     raise ArgumentError, 'Alphabet must contain all characters' unless transition_function.values.flat_map{|transitions| transitions.keys}.uniq.all?{|character| alphabet.include?(character)}
 
-    raise ArgumentError, 'Initial state must have transition for another state' unless transition_function[initial_state].values.flatten.any?{|state| [state] != initial_state}
+    raise ArgumentError, 'It must have transition from Initial state' unless transition_function[initial_state].values.flatten.any?{|state| [state] != initial_state}
+
+    # raise ArgumentError, 'It must have transition for final states' 
+
+    # raise ArgumentError, 'It must have transition for and from ordinary states' 
+
+    # raise ArgumentError, 'It must have no cycle in eclosure' 
 
     @states=states    
-    @transition_function = transition_function                     
+    @transition_function = {}                    
     @alphabet = alphabet 
     @initial_state = initial_state
     @final_states = final_states
+
+    @states.each{|state| @transition_function[state] = Hash[ alphabet.map{|character| [character,[]]}] }
+
+    transition_function.each_pair do |state, transitions|
+	transitions.each_pair{ |character, reached_state| @transition_function[state][character].concat(reached_state)}
+    end
   end                   
 
   def eclose(state, transition_function=@transition_function) 
