@@ -10,6 +10,9 @@ class Conversor
     raise ArgumentError, 'Transition function must be not empty'  if  transition_function==nil || transition_function.empty? 
     raise ArgumentError, 'Initial state must be not null'  if initial_state==nil
     raise ArgumentError, 'Final states must be not empty'  if final_states==nil || final_states.empty?
+
+    raise ArgumentError, 'State must contain Initial state' unless states.include?(initial_state)
+    raise ArgumentError, 'State must contain Final states' unless final_states.all?{|final_state| (final_state & states.flatten)==final_state}
     
     @states=states    
     @transition_function = transition_function                     
