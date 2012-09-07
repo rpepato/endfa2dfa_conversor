@@ -228,6 +228,14 @@ should false}.to raise_error(ArgumentError, 'State must contain all reached stat
 should false}.to raise_error(ArgumentError, 'Alphabet must contain all characters')
     end
 
+    it "should raise an exception notifying initial states without transition" do
+      @endfa.transition_function[[:q0]]['']=[:q0]
+      @endfa.transition_function[[:q0]]['+']=[:q0]
+      @endfa.transition_function[[:q0]]['-']=[:q0]
+      expect{Conversor.new(@endfa.states, @endfa.alphabet, @endfa.transition_function, @endfa.initial_state, @endfa.final_states)
+should false}.to raise_error(ArgumentError, 'Initial state must have transition for another state')
+    end
+
     it "should get simple e-close for state" do
       @endfa.eclose([:q1]).should == [:q1]
       @endfa.eclose([:q1]).should == [:q1]      

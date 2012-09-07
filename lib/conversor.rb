@@ -17,6 +17,8 @@ class Conversor
   
     raise ArgumentError, 'Alphabet must contain all characters' unless transition_function.values.flat_map{|transitions| transitions.keys}.uniq.all?{|character| alphabet.include?(character)}
 
+    raise ArgumentError, 'Initial state must have transition for another state' unless transition_function[initial_state].values.flatten.any?{|state| [state] != initial_state}
+
     @states=states    
     @transition_function = transition_function                     
     @alphabet = alphabet 
