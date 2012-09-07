@@ -216,6 +216,12 @@ should false}.to raise_error(ArgumentError, 'State must contain Initial state')
 should false}.to raise_error(ArgumentError, 'State must contain Final states')
     end
 
+    it "should raise an exception notifying state doesnt contain reached state" do
+      @endfa.transition_function[[:q2]]['+']=[:q666]
+      expect{Conversor.new(@endfa.states, @endfa.alphabet, @endfa.transition_function, @endfa.initial_state, @endfa.final_states)
+should false}.to raise_error(ArgumentError, 'State must contain all reached states')
+    end
+
     it "should get simple e-close for state" do
       @endfa.eclose([:q1]).should == [:q1]
       @endfa.eclose([:q1]).should == [:q1]      
