@@ -15,6 +15,8 @@ class Conversor
     raise ArgumentError, 'State must contain Final states' unless final_states.all?{|final_state| (final_state & states.flatten)==final_state}
     raise ArgumentError, 'State must contain all reached states' unless transition_function.values.flat_map{|transitions| transitions.values}.all?{|reached_state| (reached_state & states.flatten)==reached_state}
   
+    raise ArgumentError, 'Alphabet must contain all characters' unless transition_function.values.flat_map{|transitions| transitions.keys}.uniq.all?{|character| alphabet.include?(character)}
+
     @states=states    
     @transition_function = transition_function                     
     @alphabet = alphabet 
