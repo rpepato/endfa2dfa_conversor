@@ -123,7 +123,7 @@ describe "E-NDFA To DFA conversor" do
                                      '9'       =>  []
                                   }                                                                      
                   		}   
-    @endfa = Conversor.new(endfa_hash, alphabect, [[:q5]], [:q0])                 		 
+    @endfa = Conversor.new(endfa_hash.keys, endfa_hash, alphabect, [[:q5]], [:q0])                 		 
     enfa       = { 	
 		          [] =>  {
 		                    ''        =>  [],
@@ -156,7 +156,7 @@ describe "E-NDFA To DFA conversor" do
 		                    'b'       =>  []
 		                  }                                                                 
 		       }                  	
-     @another_enfa = Conversor.new(enfa, ['','a','b'], [[:q1]], [:q0])                                                                                                    
+     @another_enfa = Conversor.new(enfa.keys, enfa, ['','a','b'], [[:q1]], [:q0])                                                                                                    
   end
   
   describe "When converting" do
