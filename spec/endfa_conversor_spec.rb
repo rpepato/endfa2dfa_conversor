@@ -160,7 +160,52 @@ describe "E-NDFA To DFA conversor" do
   end
   
   describe "When converting" do
-    
+
+    it "should raise an exception notifying null states" do
+      expect{Conversor.new(nil, @endfa.alphabet, @endfa.transition_function, @endfa.initial_state, @endfa.final_states)
+should false}.to raise_error(ArgumentError, 'States must be not empty')
+    end
+
+    it "should raise an exception notifying empty states" do
+      expect{Conversor.new([], @endfa.alphabet, @endfa.transition_function, @endfa.initial_state, @endfa.final_states)
+should false}.to raise_error(ArgumentError, 'States must be not empty')
+    end
+
+    it "should raise an exception notifying null alphabet" do
+      expect{Conversor.new(@endfa.states, nil, @endfa.transition_function, @endfa.initial_state, @endfa.final_states)
+should false}.to raise_error(ArgumentError, 'Alphabet must be not empty')
+    end
+
+    it "should raise an exception notifying empty alphabet" do
+      expect{Conversor.new(@endfa.states, [], @endfa.transition_function, @endfa.initial_state, @endfa.final_states)
+should false}.to raise_error(ArgumentError, 'Alphabet must be not empty')
+    end
+
+    it "should raise an exception notifying null transition function" do
+      expect{Conversor.new(@endfa.states, @endfa.alphabet, nil, @endfa.initial_state, @endfa.final_states)
+should false}.to raise_error(ArgumentError, 'Transition function must be not empty')
+    end
+
+    it "should raise an exception notifying empty transition function" do
+      expect{Conversor.new(@endfa.states, @endfa.alphabet, {}, @endfa.initial_state, @endfa.final_states)
+should false}.to raise_error(ArgumentError, 'Transition function must be not empty')
+    end
+
+    it "should raise an exception notifying null initial state" do
+      expect{Conversor.new(@endfa.states, @endfa.alphabet, @endfa.transition_function, nil, @endfa.final_states)
+should false}.to raise_error(ArgumentError, 'Initial state must be not null')
+    end
+
+    it "should raise an exception notifying null final states" do
+      expect{Conversor.new(@endfa.states, @endfa.alphabet, @endfa.transition_function, @endfa.initial_state, nil)
+should false}.to raise_error(ArgumentError, 'Final states must be not empty')
+    end
+
+    it "should raise an exception notifying null final state" do
+      expect{Conversor.new(@endfa.states, @endfa.alphabet, @endfa.transition_function, @endfa.initial_state, [])
+should false}.to raise_error(ArgumentError, 'Final states must be not empty')
+    end
+
     it "should get simple e-close for state" do
       @endfa.eclose([:q1]).should == [:q1]
       @endfa.eclose([:q1]).should == [:q1]      
@@ -215,7 +260,7 @@ describe "E-NDFA To DFA conversor" do
 				  }                                                          
 		       } 
 
-       Conversor.new.eclose([:q0],enfa).should == [:q0, :q1, :q2, :q3, :q5]
+       Conversor.new(enfa.keys,['','a','b'],enfa,[:q0],[[:q6]]).eclose([:q0],enfa).should == [:q0, :q1, :q2, :q3, :q5]
     end  
    
     it "should get e-close for epsilon state" do

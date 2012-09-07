@@ -1,9 +1,16 @@
 # encoding: utf-8 
 # teste de github
 class Conversor
-  attr_reader :transition_function, :initial_state, :alphabet, :final_states
+  attr_reader :states, :transition_function, :initial_state, :alphabet, :final_states
 
-  def initialize(states=[], transition_function = {}, alphabet = [], final_states = [], initial_state=[])
+  def initialize(states=[], alphabet = [], transition_function = {}, initial_state=[], final_states = [])
+
+    raise ArgumentError, 'States must be not empty'  if states==nil || states.empty? 
+    raise ArgumentError, 'Alphabet must be not empty'  if alphabet==nil || alphabet.empty? 
+    raise ArgumentError, 'Transition function must be not empty'  if  transition_function==nil || transition_function.empty? 
+    raise ArgumentError, 'Initial state must be not null'  if initial_state==nil
+    raise ArgumentError, 'Final states must be not empty'  if final_states==nil || final_states.empty?
+    
     @states=states    
     @transition_function = transition_function                     
     @alphabet = alphabet 
@@ -24,7 +31,7 @@ class Conversor
      dfa_transition_function = {} 
      dfa_alphabet = @alphabet.select{|symbol| symbol!=''}                                                                            
      insert_new_state(dfa_transition_function, dfa_alphabet, eclose(@initial_state),@transition_function)   
-     Conversor.new(dfa_transition_function.keys, dfa_transition_function, dfa_alphabet, dfa_final_states(dfa_transition_function,@final_states), eclose(@initial_state) )
+     Conversor.new(dfa_transition_function.keys, dfa_alphabet, dfa_transition_function, eclose(@initial_state), dfa_final_states(dfa_transition_function,@final_states))
   end  
 
   def insert_new_state( dfa_transition_function, alphabet, state, transition_function) 
@@ -54,7 +61,7 @@ class Conversor
 
   def to_nfa
 	nfa_alphabet = @alphabet.select{|symbol| symbol!=''}
-	Conversor.new(@states, nfa_transition_function(@transition_function, nfa_alphabet), nfa_alphabet, nfa_final_states(@transition_function, @final_states), @initial_state)
+	Conversor.new(@states, nfa_alphabet, nfa_transition_function(@transition_function, nfa_alphabet), @initial_state, nfa_final_states(@transition_function, @final_states))
   end
   
   def nfa_transition_function(old_automaton, alphabet)
