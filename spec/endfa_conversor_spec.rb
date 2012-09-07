@@ -150,7 +150,7 @@ describe "E-NDFA To DFA conversor" do
 		                    'a'       =>  [:q4],
 		                    'b'       =>  []
 		                  },
-			  [:q4] =>  {
+		          [:q4] =>  {
 		                    ''        =>  [:q1],
 		                    'a'       =>  [],
 		                    'b'       =>  []

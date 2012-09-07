@@ -3,15 +3,20 @@
 class Conversor
   attr_reader :transition_function, :initial_state, :alphabet, :final_states
 
-  def initialize(automaton = {}, alphabet = [], final_states = [], initial_state=[])
-    @transition_function = automaton                     
+  def initialize(transition_function = {}, alphabet = [], final_states = [], initial_state=[])
+    @transition_function = transition_function                     
     @alphabet = alphabet 
     @initial_state = initial_state
     @final_states = final_states
-  end                     
-  
-  def eclose(state, transition_function=@transition_function)  
-     (state+transition_function[state]['']).uniq 
+  end                   
+
+  def eclose(state, states=@transition_function) 
+	reached_states = states[state][''].select{|reached_state| reached_state != state}
+	if( reached_states.empty?)
+	 	state		
+	else
+		reached_states.flat_map{|reached_state| eclose([reached_state],states)}.concat(state).sort.uniq
+	end
   end
   
   def to_dfa
