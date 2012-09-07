@@ -169,7 +169,55 @@ describe "E-NDFA To DFA conversor" do
     it "should get composite e-close for state" do
        @endfa.eclose([:q3]).should == [:q3, :q5]
     end  
-    
+ 
+    it "should get recursive e-close for state" do
+
+    enfa       = { 	
+		          [] =>  {
+		                    ''        =>  [],
+		                    'a'       =>  [],
+		                    'b'       =>  []
+		                  },
+		          [:q0] =>  {
+		                    ''        =>  [:q1,:q3],
+		                    'a'       =>  [],
+		                    'b'       =>  []
+		                  },
+		          [:q1] =>  {
+		                    ''        =>  [:q2],
+		                    'a'       =>  [],
+		                    'b'       =>  []
+		                  }, 
+		          [:q2] =>  {
+		                    ''        =>  [:q5],
+		                    'a'       =>  [],
+		                    'b'       =>  []
+		                  },
+		          [:q3] =>  {
+		                    ''        =>  [],
+		                    'a'       =>  [:q4],
+		                    'b'       =>  []
+		                  },
+		          [:q4] =>  {
+		                    ''        =>  [:q6],
+		                    'a'       =>  [],
+		                    'b'       =>  [:q5]
+		                  } , 
+			  [:q5] =>  {
+		                    ''        =>  [],
+		                    'a'       =>  [],
+		                    'b'       =>  []
+				  }  , 
+			  [:q6] =>  {
+		                    ''        =>  [],
+		                    'a'       =>  [],
+		                    'b'       =>  []
+				  }                                                          
+		       } 
+
+       Conversor.new.eclose([:q0],enfa).should == [:q0, :q1, :q2, :q3, :q5]
+    end  
+   
     it "should get e-close for epsilon state" do
        @endfa.eclose([]).should == []
     end
