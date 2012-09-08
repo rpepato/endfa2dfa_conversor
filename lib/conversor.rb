@@ -11,11 +11,11 @@ class Conversor
     raise ArgumentError, 'Initial state must be not null'  if initial_state==nil
     raise ArgumentError, 'Final states must be not empty'  if final_states==nil || final_states.empty?
 
-    raise ArgumentError, 'State must contain Initial state' unless states.include?(initial_state)
-    raise ArgumentError, 'State must contain Final states' unless final_states.all?{|final_state| (final_state & states.flatten)==final_state}
-    raise ArgumentError, 'State must contain all reached states' unless transition_function.values.flat_map{|transitions| transitions.values}.all?{|reached_state| (reached_state & states.flatten)==reached_state}
+    raise ArgumentError, 'States must contain Initial state' unless states.include?(initial_state)
+    raise ArgumentError, 'States must contain Final states' unless final_states.all?{|final_state| (final_state & states.flatten)==final_state}
+    raise ArgumentError, 'States must contain all reached states' unless transition_function.values.flat_map{|transitions| transitions.values}.all?{|reached_state| (reached_state & states.flatten)==reached_state}
   
-    raise ArgumentError, 'Alphabet must contain all characters' unless transition_function.values.flat_map{|transitions| transitions.keys}.uniq.all?{|character| alphabet.include?(character)}
+    raise ArgumentError, 'Alphabet must contain all characters of transition function' unless transition_function.values.flat_map{|transitions| transitions.keys}.uniq.all?{|character| alphabet.include?(character)}
 
     raise ArgumentError, 'It must have transition from Initial state' unless transition_function[initial_state].values.flatten.any?{|state| [state] != initial_state}
 
@@ -26,32 +26,38 @@ class Conversor
     # raise ArgumentError, 'It must have no cycle in eclosure' 
 
     @states=states    
-    @transition_function = {}                    
+    @transition_function = complete_transition_function( states, alphabet, transition_function )                    
     @alphabet = alphabet 
     @initial_state = initial_state
     @final_states = final_states
+  end   
 
-    @states.each{|state| @transition_function[state] = Hash[ alphabet.map{|character| [character,[]]}] }
+  def complete_transition_function( states, alphabet, transition_function )
+
+    complete_transition_function = {}
+    states.each{|state| complete_transition_function[state] = Hash[ alphabet.map{|character| [character,[]]}] }
 
     transition_function.each_pair do |state, transitions|
-	transitions.each_pair{ |character, reached_state| @transition_function[state][character].concat(reached_state)}
+	transitions.each_pair{ |character, reached_state| complete_transition_function[state][character].concat(reached_state)}
     end
-  end                   
+
+    complete_transition_function
+  end                
 
   def eclose(state, transition_function=@transition_function) 
-	reached_states = transition_function[state][''].select{|reached_state| reached_state != state}
-	if( reached_states.empty?)
-	 	state		
-	else
-		reached_states.flat_map{|reached_state| eclose([reached_state],transition_function)}.concat(state).sort.uniq
-	end
+    reached_states = transition_function[state][''].select{|reached_state| reached_state != state}
+    if( reached_states.empty?)
+	 state		
+    else
+	 reached_states.flat_map{|reached_state| eclose([reached_state],transition_function)}.concat(state).sort.uniq
+    end
   end
   
   def to_dfa
      dfa_transition_function = {} 
      dfa_alphabet = @alphabet.select{|symbol| symbol!=''}                                                                            
      insert_new_state(dfa_transition_function, dfa_alphabet, eclose(@initial_state),@transition_function)   
-     Conversor.new(dfa_transition_function.keys, dfa_alphabet, dfa_transition_function, eclose(@initial_state), dfa_final_states(dfa_transition_function,@final_states))
+     Conversor.new(dfa_transition_function.keys, dfa_alphabet, dfa_transition_function, eclose(@initial_state), dfa_final_states(dfa_transition_function.keys, dfa_transition_function,@final_states))
   end  
 
   def insert_new_state( dfa_transition_function, alphabet, state, transition_function) 
@@ -75,22 +81,22 @@ class Conversor
 	[symbol, reached_states]
   end
 
-  def dfa_final_states(transition_function,final_states)
-    	transition_function.keys.select{|state| final_states.one?{|final_state| ! (final_state & state).empty? } }.uniq.sort
+  def dfa_final_states(states, transition_function,final_states)
+    	states.reject{|state| final_states.all?{|final_state| (final_state & state).empty? } }.uniq.sort
   end
 
   def to_nfa
 	nfa_alphabet = @alphabet.select{|symbol| symbol!=''}
-	Conversor.new(@states, nfa_alphabet, nfa_transition_function(@transition_function, nfa_alphabet), @initial_state, nfa_final_states(@transition_function, @final_states))
+	Conversor.new(@states, nfa_alphabet, nfa_transition_function(@states, @transition_function, nfa_alphabet), @initial_state, nfa_final_states(@states, @transition_function, @final_states))
   end
   
-  def nfa_transition_function(old_automaton, alphabet)
-	nfa_states = old_automaton.keys.map{|state| [state, transitions(state, alphabet, old_automaton)]}
+  def nfa_transition_function(enfa_states, enfa_transition_function, nfa_alphabet)
+	nfa_states = enfa_states.map{|state| [state, transitions(state, nfa_alphabet, enfa_transition_function)]}
 	Hash[nfa_states]
   end
 
-  def nfa_final_states(transition_function, final_states)
-	( transition_function.keys.select{|state| ! ( eclose(state,transition_function) & final_states ).empty? } + final_states ).uniq.sort		
+  def nfa_final_states(enfa_states, enfa_transition_function, enfa_final_states)
+	enfa_states.reject{|state| final_states.all?{|final_state| (eclose(state,enfa_transition_function) & final_state).empty?} }.uniq.sort			
   end	
 end   
 

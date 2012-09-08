@@ -208,24 +208,24 @@ should false}.to raise_error(ArgumentError, 'Final states must be not empty')
 
     it "should raise an exception notifying states doesnt contain initial state" do
       expect{Conversor.new(@endfa.states, @endfa.alphabet, @endfa.transition_function, [:q666], @endfa.final_states)
-should false}.to raise_error(ArgumentError, 'State must contain Initial state')
+should false}.to raise_error(ArgumentError, 'States must contain Initial state')
     end
 
     it "should raise an exception notifying states doesnt contain final states" do
       expect{Conversor.new(@endfa.states, @endfa.alphabet, @endfa.transition_function, @endfa.initial_state, [[:q51],[:q69]])
-should false}.to raise_error(ArgumentError, 'State must contain Final states')
+should false}.to raise_error(ArgumentError, 'States must contain Final states')
     end
 
     it "should raise an exception notifying states doesnt contain reached state" do
       @endfa.transition_function[[:q2]]['+']=[:q666]
       expect{Conversor.new(@endfa.states, @endfa.alphabet, @endfa.transition_function, @endfa.initial_state, @endfa.final_states)
-should false}.to raise_error(ArgumentError, 'State must contain all reached states')
+should false}.to raise_error(ArgumentError, 'States must contain all reached states')
     end
 
     it "should raise an exception notifying alphabet doesnt contain character" do
       @endfa.transition_function[[:q2]]['z']=[:q4]
       expect{Conversor.new(@endfa.states, @endfa.alphabet, @endfa.transition_function, @endfa.initial_state,@endfa.final_states)
-should false}.to raise_error(ArgumentError, 'Alphabet must contain all characters')
+should false}.to raise_error(ArgumentError, 'Alphabet must contain all characters of transition function')
     end
 
     it "should raise an exception notifying initial states without transition" do
@@ -236,7 +236,7 @@ should false}.to raise_error(ArgumentError, 'Alphabet must contain all character
 should false}.to raise_error(ArgumentError, 'It must have transition from Initial state')
     end
 
-    it "should complete enfa" do
+    it "should complete transition function" do
     enfa       = { 	
 		          [:q0] =>  {
 		                    ''        =>  [:q1]
