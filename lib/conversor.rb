@@ -57,7 +57,12 @@ class Conversor
      dfa_transition_function = {} 
      dfa_alphabet = @alphabet.select{|symbol| symbol!=''}                                                                            
      insert_new_state(dfa_transition_function, dfa_alphabet, eclose(@initial_state),@transition_function)   
-     Conversor.new(dfa_transition_function.keys, dfa_alphabet, dfa_transition_function, eclose(@initial_state), dfa_final_states(dfa_transition_function.keys, dfa_transition_function,@final_states))
+     Conversor.new(
+	dfa_transition_function.keys, 
+	dfa_alphabet, 
+	dfa_transition_function, 
+	eclose(@initial_state), 
+	dfa_final_states(dfa_transition_function.keys, dfa_transition_function,@final_states))
   end  
 
   def insert_new_state( dfa_transition_function, alphabet, state, transition_function) 
@@ -77,7 +82,10 @@ class Conversor
   end
 
   def transition( states, symbol, transition_function)
-	reached_states = states.flat_map{ |state| eclose([state], transition_function)}.flat_map{ |state| transition_function[[state]][symbol]}.flat_map{ |state| eclose([state],transition_function)}.uniq.sort 
+	reached_states = states.flat_map{ |state| eclose([state], transition_function)}.
+				flat_map{ |state| transition_function[[state]][symbol]}.
+				flat_map{ |state| eclose([state],transition_function)}.
+				uniq.sort 
 	[symbol, reached_states]
   end
 
@@ -87,7 +95,12 @@ class Conversor
 
   def to_nfa
 	nfa_alphabet = @alphabet.select{|symbol| symbol!=''}
-	Conversor.new(@states, nfa_alphabet, nfa_transition_function(@states, @transition_function, nfa_alphabet), @initial_state, nfa_final_states(@states, @transition_function, @final_states))
+	Conversor.new(
+		@states, 
+		nfa_alphabet, 
+		nfa_transition_function(@states, @transition_function, nfa_alphabet), 
+		@initial_state, 
+		nfa_final_states(@states, @transition_function, @final_states))
   end
   
   def nfa_transition_function(enfa_states, enfa_transition_function, nfa_alphabet)
