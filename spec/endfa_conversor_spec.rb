@@ -491,7 +491,7 @@ should false}.to raise_error(ArgumentError, "It must have transition from Initia
   end
   
   it "should set final states for nfa processing" do
-     @another_enfa.to_nfa.final_states.should =~ [[:q1]]
+     @another_enfa.to_nfa.final_states.should =~ [[:q0], [:q1], [:q4]]
   end        
   
   

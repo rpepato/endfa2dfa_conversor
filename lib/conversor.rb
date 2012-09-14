@@ -109,7 +109,7 @@ class Conversor
   end
 
   def nfa_final_states(enfa_states, enfa_transition_function, enfa_final_states)
-  	enfa_states.reject{|state| final_states.all?{|final_state| (state & final_state).empty?} }.uniq.sort			
+  	enfa_states.reject{|state| final_states.all?{|final_state| (eclose(state,enfa_transition_function) & final_state).empty?} }.uniq.sort			
   end	
 end   
 
