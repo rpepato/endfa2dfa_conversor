@@ -47,15 +47,22 @@ class ContextFreeGrammar
 
 	def eliminate_nongenerating_symbols
 
-		generating_symbols = generating_symbols( productions, [].concat(terminals) )
+		generating_symbols = generating_symbols( productions, terminals )
 
 		ContextFreeGrammar.new(
-			[].concat(@terminals) & [].concat(generating_symbols),
-			[].concat(@variables) & [].concat(generating_symbols),
+			@terminals & generating_symbols,
+			@variables & generating_symbols,
 			@start_symbol,
-			productions_without_nongenerating_variables( [].concat(@variables) - generating_symbols, @productions )
+			productions_without_nongenerating_variables( @variables - generating_symbols, @productions )
 		)
-	end	
+	end
+
+	def prenormalize
+		eliminate_epsilon_productions.
+		eliminate_unit_productions.
+		eliminate_nongenerating_symbols
+	end
+			
 
 end  
 

@@ -2,11 +2,11 @@
 module NongeneratingSymbolEliminator
 
 	def generating_symbols( productions, generating_symbols )
-		bla = productions.detect{ |variable,production| production.any?{ |production_body| production_body.all?{ |symbol| generating_symbols.include?(symbol) } } and ! generating_symbols.include?(variable) }
-		if(bla == nil)
+		generating_symbol = productions.detect{ |variable,production| production.any?{ |production_body| production_body.all?{ |symbol| generating_symbols.include?(symbol) } } and ! generating_symbols.include?(variable) }
+		if(generating_symbol == nil)
 			generating_symbols
 		else
-			generating_symbols( productions, generating_symbols << bla[0] )
+			generating_symbols( productions, generating_symbols + [generating_symbol[0]] )
 		end
 	end
 

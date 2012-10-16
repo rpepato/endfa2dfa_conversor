@@ -23,7 +23,7 @@ describe "It eliminates nongenerating symbols of context free grammars" do
   describe "When eliminating nongenerating symbols" do
   
   it "should find all generating symbols" do
-     @cfgrammar.generating_symbols( @productions, [].concat(@terminals) ).should == ["a", "b", :S, :A]
+     @cfgrammar.generating_symbols( @productions, @terminals ).should == ["a", "b", :S, :A]
   end
 
   it "should generate productions without nongenerating variables" do
