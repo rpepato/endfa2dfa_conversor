@@ -1,30 +1,12 @@
 # encoding: utf-8 
-# teste de github
-class Normalizer
-  	attr_reader  :terminals, :variables, :start_symbol, :productions
+module EpsilonProdutionEliminator
 
-	def initialize(terminals=[], variables = [], start_symbol = [] , productions={})
-
-		raise ArgumentError, 'Terminals must be not empty'  if terminals==nil || terminals.empty? 
-		raise ArgumentError, 'Variables must be not empty'  if variables==nil || variables.empty? 
-		raise ArgumentError, 'Start symbol must be not empty'  if  start_symbol==nil 
-		raise ArgumentError, 'Productions must be not empty'  if productions==nil || productions.empty?
-
-		raise ArgumentError, 'Variables must contain Start Symbol' unless variables.include?(start_symbol)
-		#    raise ArgumentError, 'For all Variable exists Production' unless final_states.all?{|final_state| (final_state & states.flatten)==final_state}
-
-		@terminals=terminals    
-		@variables = variables                   
-		@start_symbol = start_symbol 
-		@productions = productions
-
-	end     
-
-#cheira a loop infinito, pensar melhor
-	def nullable?( variable, variables = @variables, productions=@productions  )
+	def nullable?( variable, variables, productions )
 		variables.include?(variable) and
-		(productions[variable].include?([:epsilon]) or 
-		productions[variable].any?{|member| member.all?{|symbol| and nullable?(symbol)}})
+		(
+			productions[variable].include?([:epsilon]) or 
+			productions[variable].any?{ |member| member.all?{|symbol| nullable?(symbol, variables, productions)}}
+		)
 	end 
 
 	def combination(index, member, terminals, variables, productions)
@@ -62,16 +44,6 @@ class Normalizer
 		new_productions = variables.map{ |variable| [variable, new_production( variable, terminals, variables, productions )] }
 		Hash[new_productions]
 	end
-
-	def eliminate_epsilon_production
-		Normalizer.new(
-			@terminals,
-			@variables,
-			@start_symbol,
-			new_productions( @terminals, @variables, @productions )
-		)
-	end
-			
 
 end  
 

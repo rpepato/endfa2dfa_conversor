@@ -1,0 +1,59 @@
+# encoding: utf-8 
+# teste de github
+class UnitProductionEliminator
+  	attr_reader  :terminals, :variables, :start_symbol, :productions
+
+	def initialize(terminals=[], variables = [], start_symbol = [] , productions={})
+
+		raise ArgumentError, 'Terminals must be not empty'  if terminals==nil || terminals.empty? 
+		raise ArgumentError, 'Variables must be not empty'  if variables==nil || variables.empty? 
+		raise ArgumentError, 'Start symbol must be not empty'  if  start_symbol==nil 
+		raise ArgumentError, 'Productions must be not empty'  if productions==nil || productions.empty?
+
+		raise ArgumentError, 'Variables must contain Start Symbol' unless variables.include?(start_symbol)
+		#    raise ArgumentError, 'For all Variable exists Production' unless final_states.all?{|final_state| (final_state & states.flatten)==final_state}
+
+		@terminals=terminals    
+		@variables = variables                   
+		@start_symbol = start_symbol 
+		@productions = productions
+
+	end   
+
+	def has_unit_production?(variable, variables, productions)
+		productions[variable].any?{ |member| member.size == 1 and ! (variables & member).empty? }	
+	end
+
+	def without_unit_productions(variable, variables, productions)
+		productions[variable].reject{ |member| member.size == 1 and ! (variables & member).empty? }	
+	end
+ 
+	def unit_productions(variable, variables, productions)
+		productions[variable].select{ |member| member.size == 1 and ! (variables & member).empty? }	
+	end 
+
+	def new_production( reached_variable, variables, productions )
+		if( ! has_unit_prodution?(reached_variable, variables, productions) )
+			productions[reached_variable]
+		else
+			without_unit_productions( reached_variable, variables, productions).concat( unit_productions(reached_variable,  variables, productions).flat_map{ |variable| pairs( variable[0], variables, productions ) } )
+		end
+	end
+
+	def new_productions( variables, productions )
+		new_productions = variables.map{ |variable| [variable, new_production( variable, variables, productions )] }
+		Hash[new_productions]
+	end
+
+	def eliminate_unit_production
+		UnitProductionEliminator.new(
+			@terminals,
+			@variables,
+			@start_symbol,
+			new_productions( @terminals, @variables, @productions )
+		)
+	end	
+
+end  
+
+
