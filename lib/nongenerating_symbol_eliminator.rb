@@ -13,11 +13,11 @@ module NongeneratingSymbolEliminator
 	def productions_without_nongenerating_variables( nongenerating_variables, productions )
 		productions_clone = productions.dup
 		nongenerating_variables.each{ |nongenerating_variable| productions_clone.delete(nongenerating_variable) }
-		saida = {}
+		result = {}
 		productions_clone.each_pair do |variable, production| 
-			saida[variable] = production.reject{ |member| ! (member & nongenerating_variables).empty? } 
+			result[variable] = production.reject{ |member| ! (member & nongenerating_variables).empty? } 
 		end
-		saida		
+		result		
 	end	
 end  
 

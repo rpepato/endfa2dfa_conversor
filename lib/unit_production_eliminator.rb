@@ -13,11 +13,17 @@ module UnitProductionEliminator
 		productions[variable].select{ |member| member.size == 1 and ! (variables & member).empty? }	
 	end 
 
-	def production_without_unit_production( reached_variable, variables, productions )
-		if( ! has_unit_production?(reached_variable, variables, productions) )
-			productions[reached_variable]
+	def production_without_unit_production( symbol, visiteds = [], variables, productions )
+		if(!visiteds.include?(symbol) and ! has_unit_production?(symbol, variables, productions) )
+			productions[symbol]
+		elsif(!visiteds.include?(symbol))
+			without_unit_productions( symbol, variables, productions ).
+			concat( 
+				unit_productions( symbol, variables, productions ).
+				flat_map{ |variable| production_without_unit_production( variable[0], visiteds << symbol, variables, productions ) } 
+			)
 		else
-			without_unit_productions( reached_variable, variables, productions ).concat( unit_productions(reached_variable,  variables, productions ).flat_map{ |variable| production_without_unit_production( variable[0], variables, productions ) } )
+			[]
 		end
 	end
 

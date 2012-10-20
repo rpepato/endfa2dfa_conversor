@@ -2,6 +2,7 @@
 require "epsilon_production_eliminator" 
 require "unit_production_eliminator" 
 require "nongenerating_symbol_eliminator"
+require "nonreachable_symbol_eliminator"
  
 class ContextFreeGrammar
   	attr_reader  :terminals, :variables, :start_symbol, :productions
@@ -9,6 +10,7 @@ class ContextFreeGrammar
 	include EpsilonProductionEliminator
 	include UnitProductionEliminator
 	include NongeneratingSymbolEliminator
+	include NonreachableSymbolEliminator
 
 	def initialize(terminals=[], variables = [], start_symbol = [] , productions={})
 
@@ -29,7 +31,7 @@ class ContextFreeGrammar
 
 	def eliminate_epsilon_productions
 		ContextFreeGrammar.new(
-			@terminals,
+			@terminals-[''],
 			@variables,
 			@start_symbol,
 			productions_without_epsilon_production( @terminals, @variables, @productions )
@@ -47,7 +49,7 @@ class ContextFreeGrammar
 
 	def eliminate_nongenerating_symbols
 
-		generating_symbols = generating_symbols( productions, terminals )
+		generating_symbols = generating_symbols( @productions, @terminals )
 
 		ContextFreeGrammar.new(
 			@terminals & generating_symbols,
@@ -57,10 +59,23 @@ class ContextFreeGrammar
 		)
 	end
 
+	def eliminate_nonreachable_symbols
+
+		reachable_symbols = reachable_symbols(@start_symbol, @terminals, @productions )
+
+		ContextFreeGrammar.new(
+			@terminals & reachable_symbols,
+			@variables & reachable_symbols,
+			@start_symbol,
+			productions_without_nonreachable_variables( @variables - reachable_symbols, @productions )
+		)
+	end
+
 	def prenormalize
 		eliminate_epsilon_productions.
 		eliminate_unit_productions.
-		eliminate_nongenerating_symbols
+		eliminate_nongenerating_symbols.
+		eliminate_nonreachable_symbols
 	end
 			
 
