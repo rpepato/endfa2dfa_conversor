@@ -39,51 +39,51 @@ describe "It eliminates unit productions of context free grammars" do
      @cfgrammar.has_unit_production?(:E, @variables, @productions).should == true
   end
 
-  it "should eliminate unit production of production" do
+  it "should eliminate unit production of :I production" do
      @cfgrammar.without_unit_productions(:I, @variables, @productions).should == @productions[:I]
   end
 
-  it "should eliminate unit production of production" do
+  it "should eliminate unit production of :F production" do
      @cfgrammar.without_unit_productions(:F, @variables, @productions).should == [['(',:E,')']]
   end
 
-  it "should eliminate unit production of production" do
+  it "should eliminate unit production of :T production" do
      @cfgrammar.without_unit_productions(:T, @variables, @productions).should == [[:T,'*',:F]]
   end
 
-  it "should eliminate unit production of production" do
+  it "should eliminate unit production of :E production" do
      @cfgrammar.without_unit_productions(:E, @variables, @productions).should == [[:E,'*',:T]]
   end
 
-  it "should give unit productions from production" do
+  it "should find unit productions from :I production" do
      @cfgrammar.unit_productions(:I, @variables, @productions).should == []
   end
 
-  it "should give unit productions from production" do
+  it "should find unit productions from :F production" do
      @cfgrammar.unit_productions(:F, @variables, @productions).should == [[:I]]
   end
 
-  it "should give unit productions from production" do
+  it "should find unit productions from :T production" do
      @cfgrammar.unit_productions(:T, @variables, @productions).should == [[:F]]
   end
 
-  it "should give unit productions from production" do
+  it "should find unit productions from :E production" do
      @cfgrammar.unit_productions(:E, @variables, @productions).should == [[:T]]
   end
 
-  it "should generate production result of unit elimination" do
+  it "should eliminate unit production of unit :I elimination" do
      @cfgrammar.production_without_unit_production(:I, @variables, @productions).should == @productions[:I]
   end
 
-  it "should generate production result of unit elimination" do
+  it "should eliminate unit production of unit :F elimination" do
      @cfgrammar.production_without_unit_production(:F, @variables, @productions).should == [['(', :E, ')'], ['a'], ['b'], [:I, 'a'], [:I, 'b'], [:I, '0'], [:I, '1']]
   end
 
-  it "should generate production result of unit elimination" do
+  it "should eliminate unit production of unit :T elimination" do
      @cfgrammar.production_without_unit_production(:T, @variables, @productions).should == [[:T, '*', :F], ['(', :E, ')'], ['a'], ['b'], [:I, 'a'], [:I, 'b'], [:I, '0'], [:I, '1']] 
   end
 
-  it "should generate production result of unit elimination" do
+  it "should eliminate unit production of unit :E elimination" do
      @cfgrammar.production_without_unit_production(:E, @variables, @productions).should == [[:E, '*', :T], [:T, '*', :F], ['(', :E, ')'], ['a'], ['b'], [:I, 'a'], [:I, 'b'], [:I, '0'], [:I, '1']]
   end 
  

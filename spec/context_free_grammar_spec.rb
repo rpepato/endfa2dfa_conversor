@@ -40,6 +40,28 @@ describe "It pre normalize context free grammars" do
 		:A =>  [['b']],
 		:B =>  [],
 	} ) 
+
+    @cfgrammar4 = ContextFreeGrammar.new(
+	['a','b'], 
+	[:S, :A, :B, :C], 
+	:S, 
+	{ 	
+		:S =>  [[:A,:B],['a']],
+		:A =>  [['b']],
+		:B =>  [],
+		:C =>  [['a','b']]
+	} ) 
+
+    @cfgrammar5 = ContextFreeGrammar.new(
+	['0','1',''], 
+	[:S, :A, :B, :C], 
+	:S, 
+	{ 	
+		:S =>  [['0',:A,'0'],['1',:B,'1'],[:B,:B]],
+		:A =>  [[:C]],
+		:B =>  [[:S],[:A]],
+		:C =>  [[:S],['']]
+	} ) 
                                                                                                               
   end
   
@@ -133,6 +155,41 @@ should false}.to raise_error(ArgumentError, "Variables must contain Start Symbol
 
   it "should mantain start symbol" do
      @cfgrammar3.eliminate_nongenerating_symbols.start_symbol.should == :S
+  end
+
+  it "should generate productions without nonreachable symbols" do
+     @cfgrammar4.eliminate_nonreachable_symbols.productions.should == {:S=>[[:A, :B], ["a"]], :A=>[["b"]]}
+  end
+
+  it "should mantain terminals" do
+     @cfgrammar4.eliminate_nonreachable_symbols.terminals.should == ['a','b']
+  end 
+
+  it "should eliminate nongenerating variables" do
+     @cfgrammar4.eliminate_nonreachable_symbols.variables.should == [:S, :A]
+  end
+
+  it "should mantain start symbol" do
+     @cfgrammar4.eliminate_nonreachable_symbols.start_symbol.should == :S
+  end
+
+  it "should generate prenormalized productions" do
+     @cfgrammar5.prenormalize.productions.should == {
+	:S=>[["0", "0"], ["0", :A, "0"], ["1", "1"], ["1", :B, "1"], [:B, :B]], 
+	:A=>[["0", "0"], ["0", :A, "0"], ["1", "1"], ["1", :B, "1"], [:B, :B]], 
+	:B=>[["0", "0"], ["0", :A, "0"], ["1", "1"], ["1", :B, "1"], [:B, :B]]}
+  end
+
+  it "should generate prenormalized terminals" do
+     @cfgrammar5.prenormalize.terminals.should ==  ['0', '1' ]
+  end
+
+  it "should generate prenormalized variables" do
+     @cfgrammar5.prenormalize.variables.should ==  [:S, :A, :B ]
+  end
+
+  it "should generate prenormalized start symbol" do
+     @cfgrammar5.prenormalize.start_symbol.should == :S
   end
 
   end
