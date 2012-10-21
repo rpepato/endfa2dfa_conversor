@@ -1,4 +1,5 @@
 # encoding: utf-8 
+require "recursive_start_symbol_eliminator"
 require "epsilon_production_eliminator" 
 require "unit_production_eliminator" 
 require "nongenerating_symbol_eliminator"
@@ -7,6 +8,7 @@ require "nonreachable_symbol_eliminator"
 class ContextFreeGrammar
   	attr_reader  :terminals, :variables, :start_symbol, :productions
 
+	include RecursiveStartSymbolEliminator
 	include EpsilonProductionEliminator
 	include UnitProductionEliminator
 	include NongeneratingSymbolEliminator
@@ -27,7 +29,19 @@ class ContextFreeGrammar
 		@start_symbol = start_symbol 
 		@productions = productions
 
-	end     
+	end 
+
+	def eliminate_recursive_start_symbol
+
+		nonrecursive_start_symbol = nonrecursive_start_symbol( @start_symbol, @variables, @productions )
+
+		ContextFreeGrammar.new(
+			@terminals,
+			[nonrecursive_start_symbol] | @variables,
+			nonrecursive_start_symbol,
+			productions_without_recursive_start_symbol( @start_symbol, @variables, @productions )
+		)
+	end    
 
 	def eliminate_epsilon_productions
 		ContextFreeGrammar.new(
@@ -72,6 +86,7 @@ class ContextFreeGrammar
 	end
 
 	def prenormalize
+		eliminate_recursive_start_symbol.
 		eliminate_epsilon_productions.
 		eliminate_unit_productions.
 		eliminate_nongenerating_symbols.

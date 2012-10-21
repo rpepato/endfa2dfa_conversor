@@ -62,7 +62,16 @@ describe "It pre normalize context free grammars" do
 		:B =>  [[:S],[:A]],
 		:C =>  [[:S],['']]
 	} ) 
-                                                                                                              
+
+      @cfgrammar6 = ContextFreeGrammar.new(
+	['a','b',''], 
+	[:S, :A, :B], 
+	:S, 
+	{ 	
+		:S =>  [[:A,:S,:B],['']],
+		:A =>  [['a',:A,:S],['a']],
+		:B =>  [[:S,'b',:S],[:A],['b','b']]
+	} )                                                                                                             
   end
   
   describe "When creating" do

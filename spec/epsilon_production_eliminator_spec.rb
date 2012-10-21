@@ -27,23 +27,23 @@ describe "It eliminates epsilon productions of context free grammars" do
   end
 
   it "should generate all combinations of :A production" do
-     @cfgrammar.combinations(['a',:A,:A], @terminals).should == [['a'],['a',:A],['a',:A, :A]]
+     @cfgrammar.combinations(['a',:A,:A], @variables, @productions).should == [['a'],['a',:A],['a',:A, :A]]
   end 
 
   it "should generate all combinations of :S production" do
-     @cfgrammar.combinations([:A,:B], @terminals).should == [[],[:B],[:A],[:A,:B]]
+     @cfgrammar.combinations([:A,:B], @variables, @productions).should == [[],[:B],[:A],[:A,:B]]
   end 
 
   it "should eliminate epsilon production of :S production" do
-     @cfgrammar.production_without_epsilon_production(:S, @terminals, @productions).should == [[:B],[:A],[:A,:B]]
+     @cfgrammar.production_without_epsilon_production(:S, @variables, @productions).should == [[:B],[:A],[:A,:B]]
   end 
 
   it "should eliminate epsilon production of :A production" do
-     @cfgrammar.production_without_epsilon_production(:A, @terminals, @productions).should == [['a'],['a',:A],['a',:A, :A]]
+     @cfgrammar.production_without_epsilon_production(:A, @variables, @productions).should == [['a'],['a',:A],['a',:A, :A]]
   end  
 
   it "should eliminate epsilon production of :B production" do
-     @cfgrammar.production_without_epsilon_production(:B, @terminals, @productions).should == [['b'],['b',:B],['b',:B, :B]]
+     @cfgrammar.production_without_epsilon_production(:B, @variables, @productions).should == [['b'],['b',:B],['b',:B, :B]]
   end 
 
   it "should eliminate epsilon production of cfgrammar" do
