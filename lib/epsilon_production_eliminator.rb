@@ -4,7 +4,7 @@ module EpsilonProductionEliminator
 	def nullable?( symbol, visiteds = [], variables, productions )
 		if(variables.include?(symbol) and productions[symbol].include?(['']) )
 			true
-		elsif(variables.include?(symbol) and !visiteds.include?(symbol)) 			
+		elsif(variables.include?(symbol) and not visiteds.include?(symbol)) 			
 			productions[symbol].any?{ |body| body.all?{|inner_symbol| nullable?(inner_symbol, visiteds << symbol, variables, productions )}}
 		else
 			false

@@ -2,9 +2,9 @@
 module NonreachableSymbolEliminator
 
 	def reachable_symbols_util( symbol, terminals, reachable_symbols, productions )
-		if( terminals.include?(symbol) and ! reachable_symbols.include?(symbol) )
+		if( terminals.include?(symbol) and not reachable_symbols.include?(symbol) )
 			reachable_symbols << symbol
-		elsif( ! reachable_symbols.include?(symbol) )
+		elsif( not reachable_symbols.include?(symbol) )
 			productions[symbol].each{|body| body.each{|inner_symbol| reachable_symbols_util( inner_symbol, terminals, reachable_symbols << symbol, productions ) }}					
 		end
 	end
