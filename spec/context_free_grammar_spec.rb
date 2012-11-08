@@ -5,7 +5,7 @@ require File.expand_path(File.join(".", "spec_helper"), File.dirname(__FILE__))
 require "context_free_grammar"    
 
 
-describe "It pre normalize context free grammars" do
+describe "It normalize context free grammars" do
   
   before(:each) do
 	@terminals = ['a','b']
@@ -27,7 +27,7 @@ describe "It pre normalize context free grammars" do
 		  :I =>  [['a'],['b'],[:I,'a'],[:I,'b'],[:I,'0'],[:I,'1']],
 		  :F =>  [[:I],['(',:E,')']],
 		  :T =>  [[:F],[:T,'*',:F]],
-		  :E =>  [[:T],[:E,'*',:T]]
+		  :E =>  [[:T],[:E,'+',:T]]
 	}  
      )       
     
@@ -134,7 +134,7 @@ should false}.to raise_error(ArgumentError, "Variables must contain Start Symbol
   end 
 
   it "should eliminate unit production of cfgrammar" do
-     @cfgrammar2.eliminate_unit_productions.productions.should == {:I=>[["a"], ["b"], [:I, "a"], [:I, "b"], [:I, "0"], [:I, "1"]], :F=>[["(", :E, ")"], ["a"], ["b"], [:I, "a"], [:I, "b"], [:I, "0"], [:I, "1"]], :T=>[[:T, "*", :F], ["(", :E, ")"], ["a"], ["b"], [:I, "a"], [:I, "b"], [:I, "0"], [:I, "1"]], :E=>[[:E, "*", :T], [:T, "*", :F], ["(", :E, ")"], ["a"], ["b"], [:I, "a"], [:I, "b"], [:I, "0"], [:I, "1"]]}
+     @cfgrammar2.eliminate_unit_productions.productions.should == {:I=>[["a"], ["b"], [:I, "a"], [:I, "b"], [:I, "0"], [:I, "1"]], :F=>[["(", :E, ")"], ["a"], ["b"], [:I, "a"], [:I, "b"], [:I, "0"], [:I, "1"]], :T=>[[:T, "*", :F], ["(", :E, ")"], ["a"], ["b"], [:I, "a"], [:I, "b"], [:I, "0"], [:I, "1"]], :E=>[[:E, "+", :T], [:T, "*", :F], ["(", :E, ")"], ["a"], ["b"], [:I, "a"], [:I, "b"], [:I, "0"], [:I, "1"]]}
 
   end
 
@@ -182,23 +182,29 @@ should false}.to raise_error(ArgumentError, "Variables must contain Start Symbol
      @cfgrammar4.eliminate_nonreachable_symbols.start_symbol.should == :S
   end
 
-  it "should generate prenormalized productions" do
-     @cfgrammar5.prenormalize.productions.should == {
-	:S=>[["0", "0"], ["0", :A, "0"], ["1", "1"], ["1", :B, "1"], [:B, :B]], 
-	:A=>[["0", "0"], ["0", :A, "0"], ["1", "1"], ["1", :B, "1"], [:B, :B]], 
-	:B=>[["0", "0"], ["0", :A, "0"], ["1", "1"], ["1", :B, "1"], [:B, :B]]}
+  it "should generate normalized productions" do
+     @cfgrammar5.normalize.productions.should == 
+	{
+	:S=>[[:X_1, :X_3], [:X_2, :X_4], [:B, :B]], 
+	:A=>[[:X_1, :X_3], [:X_2, :X_4], [:B, :B]], 
+	:B=>[[:X_1, :X_3], [:X_2, :X_4], [:B, :B]], 
+	:X_1=>[["0"]], 
+	:X_2=>[["1"]], 
+	:X_3=>[[:A, :X_1], ["0"]], 
+	:X_4=>[[:B, :X_2], ["1"]]
+	}
   end
 
-  it "should generate prenormalized terminals" do
-     @cfgrammar5.prenormalize.terminals.should ==  ['0', '1' ]
+  it "should generate normalized terminals" do
+     @cfgrammar5.normalize.terminals.should ==  ['0', '1' ]
   end
 
-  it "should generate prenormalized variables" do
-     @cfgrammar5.prenormalize.variables.should ==  [:S, :A, :B ]
+  it "should generate normalized variables" do
+     @cfgrammar5.normalize.variables.should ==  [:S, :A, :B, :X_1, :X_2, :X_3, :X_4]
   end
 
-  it "should generate prenormalized start symbol" do
-     @cfgrammar5.prenormalize.start_symbol.should == :S
+  it "should generate normalized start symbol" do
+     @cfgrammar5.normalize.start_symbol.should == :S
   end
 
   end
