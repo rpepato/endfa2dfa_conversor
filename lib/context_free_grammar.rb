@@ -45,7 +45,7 @@ class ContextFreeGrammar
 		)
 	end 
 
-	def format_productionss
+	def format
 		variable_index = [0]
 		format_productions(variable_index, @variables, @productions)
 		break_productions(variable_index, @variables, @productions)
@@ -101,7 +101,7 @@ class ContextFreeGrammar
 
 	def normalize
 		eliminate_recursive_start_symbol.
-		format_productionss.
+		format.
 		eliminate_epsilon_productions.
 		eliminate_unit_productions.
 		eliminate_nongenerating_symbols.
