@@ -1,4 +1,5 @@
 # encoding: utf-8 
+ $LOAD_PATH << '.'
 require "recursive_start_symbol_eliminator"
 require "production_formatter"
 require "epsilon_production_eliminator" 

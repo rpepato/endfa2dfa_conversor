@@ -1,4 +1,5 @@
 # encoding: utf-8
+ $LOAD_PATH << '.'
 require "simplecov"
 SimpleCov.start
 require File.expand_path(File.join(".", "spec_helper"), File.dirname(__FILE__))
@@ -10,7 +11,7 @@ describe "It normalize context free grammars" do
   before(:each) do
 	@terminals = ['a','b']
 	@variables = [:A, :B, :S]
-    	@start_symbol = :S
+  @start_symbol = :S
 	@productions = { 	
 		          :S =>  [[:A,:B]],
 		          :A =>  [['a',:A,:A],['']],
